@@ -3,11 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using demo.ef.Models;
 
 namespace demo.ef.Controllers
 {
     public class HomeController : Controller
     {
+        private ApplicationDbContext _context;
+
+        public HomeController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
         public IActionResult Index()
         {
             return View();
@@ -17,13 +25,20 @@ namespace demo.ef.Controllers
         {
             ViewData["Message"] = "Your application description page.";
 
-            return View();
+            return View(_context.Users.ToList());
         }
 
         public IActionResult Contact()
         {
             ViewData["Message"] = "Your contact page.";
-
+            if (!_context.Users.Any())
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    _context.Users.Add(new User { FirstName = "User", LastName = "number " + i });
+                }
+                _context.SaveChanges();
+            }
             return View();
         }
 
